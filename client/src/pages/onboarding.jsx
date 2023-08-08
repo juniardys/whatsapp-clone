@@ -40,6 +40,7 @@ function onboarding() {
               status: about,
             },
           });
+          router.push("/");
         }
       } catch (error) {
         console.log(error);
