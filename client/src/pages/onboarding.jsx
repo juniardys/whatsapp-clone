@@ -6,6 +6,7 @@ import Avatar from "@/components/common/Avatar";
 import axios from "axios";
 import { ONBOARD_USER_ROUTE } from "@/utils/ApiRoutes";
 import { useRouter } from "next/router";
+import { reducerCases } from "@/context/constants";
 
 function onboarding() {
   const router = useRouter();
