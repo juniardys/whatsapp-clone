@@ -42,9 +42,13 @@ const reducer = (state, action) => {
                 socket: action.socket,
             }
         case reducerCases.ADD_MESSAGE:
+            let messages = [...state.messages];
+            if (action.from === state.currentChatUser?.id || action?.fromSelf) {
+                messages = [...messages, action.newMessage];
+            }
             return {
                 ...state,
-                messages: [...state.messages, action.newMessage],
+                messages,
             }
         default:
             return state;

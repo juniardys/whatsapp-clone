@@ -66,6 +66,7 @@ function Main() {
       socket.current.on("msg-receive", (data) => {
         dispatch({
           type: reducerCases.ADD_MESSAGE,
+          from: data.from,
           newMessage: {
             ...data.message,
           },
