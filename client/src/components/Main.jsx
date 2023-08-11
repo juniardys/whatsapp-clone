@@ -1,3 +1,4 @@
+import Chat from "@/components/Chat/Chat";
 import ChatList from "@/components/Chatlist/ChatList";
 import Empty from "@/components/Empty";
 import { useStateProvider } from "@/context/StateContext";
@@ -53,7 +54,8 @@ function Main() {
     <>
       <div className="grid grid-cols-main h-screen w-screen max-h-screen max-w-full overflow-hidden">
         <ChatList />
-        <Empty />
+        {/* <Empty /> */}
+        <Chat />
       </div>
     </>
   );
