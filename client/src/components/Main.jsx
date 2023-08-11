@@ -3,17 +3,20 @@ import ChatList from "@/components/Chatlist/ChatList";
 import Empty from "@/components/Empty";
 import { useStateProvider } from "@/context/StateContext";
 import { reducerCases } from "@/context/constants";
-import { CHECK_USER_ROUTE } from "@/utils/ApiRoutes";
+import { CHECK_USER_ROUTE, GET_MESSAGES_ROUTE, HOST } from "@/utils/ApiRoutes";
 import { firebaseAuth } from "@/utils/FirebaseConfig";
 import axios from "axios";
 import { onAuthStateChanged } from "firebase/auth";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { io } from "socket.io-client";
 
 function Main() {
   const router = useRouter();
   const [{ userInfo, currentChatUser }, dispatch] = useStateProvider();
   const [redirectLogin, setRedirectLogin] = useState(false);
+  const [socketEvent, setSocketEvent] = useState(false);
+  const socket = useRef();
 
   useEffect(() => {
     if (redirectLogin) router.push("/login");
@@ -49,6 +52,46 @@ function Main() {
       }
     }
   });
+
+  useEffect(() => {
+    if (userInfo) {
+      socket.current = io(HOST);
+      socket.current.emit("add-user", userInfo.id);
+      dispatch({ type: reducerCases.SET_SOCKET, socket });
+    }
+  }, [userInfo]);
+
+  useEffect(() => {
+    if (socket.current && !socketEvent) {
+      socket.current.on("msg-receive", (data) => {
+        dispatch({
+          type: reducerCases.ADD_MESSAGE,
+          newMessage: {
+            ...data.message,
+          },
+        });
+      });
+      setSocketEvent(true);
+    }
+  }, [socket.current]);
+
+  useEffect(() => {
+    const getMessages = async () => {
+      try {
+        const {
+          data: { messages },
+        } = await axios.get(
+          `${GET_MESSAGES_ROUTE}/${userInfo.id}/${currentChatUser.id}`
+        );
+        dispatch({ type: reducerCases.SET_MESSAGES, messages });
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    if (currentChatUser?.id) {
+      getMessages();
+    }
+  }, [currentChatUser]);
 
   return (
     <>
