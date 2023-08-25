@@ -2,7 +2,12 @@ import ImageMessage from "@/components/Chat/ImageMessage";
 import MessageStatus from "@/components/common/MessageStatus";
 import { useStateProvider } from "@/context/StateContext";
 import { calculateTime } from "@/utils/CalculateTime";
+import dynamic from "next/dynamic";
 import React from "react";
+
+const VoiceMessage = dynamic(() => import("@/components/Chat/VoiceMessage"), {
+  ssr: false,
+});
 
 function ChatContainer() {
   const [{ messages, currentChatUser, userInfo }, dispatch] =
@@ -46,6 +51,7 @@ function ChatContainer() {
                   </div>
                 )}
                 {message.type === "image" && <ImageMessage message={message} />}
+                {message.type === "audio" && <VoiceMessage message={message} />}
               </div>
             ))}
           </div>
