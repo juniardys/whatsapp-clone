@@ -1,7 +1,7 @@
-import ChatListHeader from "@/components/Chatlist/ChatListHeader";
-import ContactsList from "@/components/Chatlist/ContactsList";
-import List from "@/components/Chatlist/List";
-import SearchBar from "@/components/Chatlist/SearchBar";
+import ChatListHeader from "@/components/ChatList/ChatListHeader";
+import ContactsList from "@/components/ChatList/ContactsList";
+import List from "@/components/ChatList/List";
+import SearchBar from "@/components/ChatList/SearchBar";
 import { useStateProvider } from "@/context/StateContext";
 import React, { useEffect, useState } from "react";
 

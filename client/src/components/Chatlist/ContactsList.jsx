@@ -1,4 +1,4 @@
-import ChatLIstItem from "@/components/Chatlist/ChatLIstItem";
+import ChatLIstItem from "@/components/ChatList/ChatLIstItem";
 import { useStateProvider } from "@/context/StateContext";
 import { reducerCases } from "@/context/constants";
 import { GET_ALL_CONTACTS } from "@/utils/ApiRoutes";

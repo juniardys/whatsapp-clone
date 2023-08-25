@@ -1,6 +1,6 @@
 import Chat from "@/components/Chat/Chat";
 import SearchMessages from "@/components/Chat/SearchMessages";
-import ChatList from "@/components/Chatlist/ChatList";
+import ChatList from "@/components/ChatList/ChatList";
 import Empty from "@/components/Empty";
 import { useStateProvider } from "@/context/StateContext";
 import { reducerCases } from "@/context/constants";
