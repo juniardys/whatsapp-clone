@@ -1,7 +1,11 @@
+import VideoCall from "@/components/Call/VideoCall";
+import VoiceCall from "@/components/Call/VoiceCall";
 import Chat from "@/components/Chat/Chat";
 import SearchMessages from "@/components/Chat/SearchMessages";
 import ChatList from "@/components/ChatList/ChatList";
 import Empty from "@/components/Empty";
+import IncomingVideoCall from "@/components/common/IncomingVideoCall";
+import IncomingVoiceCall from "@/components/common/IncomingVoiceCall";
 import { useStateProvider } from "@/context/StateContext";
 import { reducerCases } from "@/context/constants";
 import { CHECK_USER_ROUTE, GET_MESSAGES_ROUTE, HOST } from "@/utils/ApiRoutes";
@@ -14,8 +18,18 @@ import { io } from "socket.io-client";
 
 function Main() {
   const router = useRouter();
-  const [{ userInfo, currentChatUser, messagesSearch }, dispatch] =
-    useStateProvider();
+  const [
+    {
+      userInfo,
+      currentChatUser,
+      messagesSearch,
+      videoCall,
+      voiceCall,
+      incomingVideoCall,
+      incomingVoiceCall,
+    },
+    dispatch,
+  ] = useStateProvider();
   const [redirectLogin, setRedirectLogin] = useState(false);
   const [socketEvent, setSocketEvent] = useState(false);
   const socket = useRef();
@@ -74,6 +88,40 @@ function Main() {
           },
         });
       });
+
+      socket.current.on("incoming-voice-call", ({ from, roomId, callType }) => {
+        dispatch({
+          type: reducerCases.SET_INCOMING_VOICE_CALL,
+          incomingVoiceCall: { ...from, roomId, callType },
+        });
+      });
+
+      socket.current.on("incoming-video-call", ({ from, roomId, callType }) => {
+        dispatch({
+          type: reducerCases.SET_INCOMING_VIDEO_CALL,
+          incomingVideoCall: { ...from, roomId, callType },
+        });
+      });
+
+      socket.current.on("voice-call-rejected", () => {
+        dispatch({
+          type: reducerCases.END_CALL,
+        });
+      });
+
+      socket.current.on("video-call-rejected", () => {
+        dispatch({
+          type: reducerCases.END_CALL,
+        });
+      });
+
+      socket.current.on("online-users", ({ onlineUsers }) => {
+        dispatch({
+          type: reducerCases.SET_ONLINE_USERS,
+          onlineUsers,
+        });
+      });
+
       setSocketEvent(true);
     }
   }, [socket.current]);
@@ -98,17 +146,33 @@ function Main() {
 
   return (
     <>
-      <div className="grid grid-cols-main h-screen w-screen max-h-screen max-w-full overflow-hidden">
-        <ChatList />
-        {currentChatUser ? (
-          <div className={messagesSearch ? "grid grid-cols-2" : "grid-cols-2"}>
-            <Chat />
-            {messagesSearch && <SearchMessages />}
-          </div>
-        ) : (
-          <Empty />
-        )}
-      </div>
+      {incomingVideoCall && <IncomingVideoCall />}
+      {incomingVoiceCall && <IncomingVoiceCall />}
+      {videoCall && (
+        <div className="h-screen w-screen max-h-full overflow-hidden">
+          <VideoCall />
+        </div>
+      )}
+      {voiceCall && (
+        <div className="h-screen w-screen max-h-full overflow-hidden">
+          <VoiceCall />
+        </div>
+      )}
+      {!videoCall && !voiceCall && (
+        <div className="grid grid-cols-main h-screen w-screen max-h-screen max-w-full overflow-hidden">
+          <ChatList />
+          {currentChatUser ? (
+            <div
+              className={messagesSearch ? "grid grid-cols-2" : "grid-cols-2"}
+            >
+              <Chat />
+              {messagesSearch && <SearchMessages />}
+            </div>
+          ) : (
+            <Empty />
+          )}
+        </div>
+      )}
     </>
   );
 }
